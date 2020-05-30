@@ -25,4 +25,5 @@ import lombok.Data;
 public abstract class TokenDetail {
     public String username;
     public String password;
+    public String userCode;
 }

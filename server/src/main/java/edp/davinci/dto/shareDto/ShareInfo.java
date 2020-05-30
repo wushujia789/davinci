@@ -19,6 +19,8 @@
 
 package edp.davinci.dto.shareDto;
 
+import java.util.Date;
+
 import edp.davinci.model.User;
 import lombok.Data;
 
@@ -39,6 +41,9 @@ public class ShareInfo {
      */
     private String sharedUserName;
 
+    private Date expirationDate ;
+    
+    private Long jwtTimeoutMs;  
 
     public ShareInfo() {
     }
@@ -47,5 +52,12 @@ public class ShareInfo {
         this.shareId = shareId;
         this.shareUser = shareUser;
         this.sharedUserName = sharedUserName;
+    }
+    public ShareInfo(Long shareId, User shareUser, String sharedUserName,Date expirationDate,Long jwtTimeoutMs) {
+        this.shareId = shareId;
+        this.shareUser = shareUser;
+        this.sharedUserName = sharedUserName;
+        this.expirationDate = expirationDate ;
+        this.jwtTimeoutMs = jwtTimeoutMs ;
     }
 }

@@ -43,6 +43,8 @@ public interface ShareService {
 
     String generateShareToken(Long shareEntityId, String username, Long userId) throws ServerException;
 
+    String generateShareToken(Long shareEntityId, String username, Long userId,Long jwtTimeoutMs) throws ServerException ;
+    
     User shareLogin(String token, UserLogin userLogin) throws NotFoundException, ServerException, UnAuthorizedExecption;
 
     ShareDisplay getShareDisplay(String token, User user) throws NotFoundException, ServerException, ForbiddenExecption, UnAuthorizedExecption;

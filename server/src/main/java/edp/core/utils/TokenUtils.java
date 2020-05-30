@@ -95,6 +95,9 @@ public class TokenUtils {
      * @return
      */
     public String generateToken(TokenDetail tokenDetail, Long timeOutMillis) {
+    	if(timeOutMillis==null) {
+    		timeOutMillis = 10L * 365L * 24L * 3600L * 1000L ;
+    	}
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put(Consts.TOKEN_USER_NAME, StringUtils.isEmpty(tokenDetail.getUsername()) ? EMPTY : tokenDetail.getUsername());
         claims.put(Consts.TOKEN_USER_PASSWORD, StringUtils.isEmpty(tokenDetail.getPassword()) ? EMPTY : tokenDetail.getPassword());
@@ -218,6 +221,23 @@ public class TokenUtils {
         }
         return password;
     }
+    
+    /**
+     * 解析 token userCode
+     *
+     * @param token
+     * @return
+     */
+    public String getUserCode(String token) {
+        String userCode;
+        try {
+            final Claims claims = getClaims(token);
+            userCode = claims.get(Consts.TOKEN_SSO_USER_CODE).toString();
+        } catch (Exception e) {
+        	userCode = null;
+        }
+        return userCode;
+    }
 
     /**
      * 获取token claims
@@ -297,7 +317,7 @@ public class TokenUtils {
      * @param token
      * @return
      */
-    private Date getExpirationDate(String token) {
+    public Date getExpirationDate(String token) {
         Date expiration;
         try {
             final Claims claims = getClaims(token);

@@ -196,7 +196,7 @@ public class ShareServiceImpl implements ShareService {
      */
     @Override
     public ShareDisplay getShareDisplay(String token, User user) throws NotFoundException, ServerException, ForbiddenExecption, UnAuthorizedExecption {
-        ShareInfo shareInfo = getShareInfo(token, user);
+        ShareInfo shareInfo = getShareInfo(token, user); // TODO
         verifyShareUser(user, shareInfo);
 
         Long displayId = shareInfo.getShareId();
@@ -247,7 +247,7 @@ public class ShareServiceImpl implements ShareService {
         Set<ShareWidget> shareWidgets = widgetMapper.getShareWidgetsByDisplayId(displayId);
         if (!CollectionUtils.isEmpty(shareWidgets)) {
             for (ShareWidget shareWidget : shareWidgets) {
-                String dateToken = generateShareToken(shareWidget.getId(), shareInfo.getSharedUserName(), shareInfo.getShareUser().getId());
+                String dateToken = generateShareToken(shareWidget.getId(), shareInfo.getSharedUserName(), shareInfo.getShareUser().getId(),shareInfo.getJwtTimeoutMs()); // TODO
                 shareWidget.setDataToken(dateToken);
             }
             shareDisplay.setWidgets(shareWidgets);
@@ -265,7 +265,7 @@ public class ShareServiceImpl implements ShareService {
      */
     @Override
     public ShareDashboard getShareDashboard(String token, User user) throws NotFoundException, ServerException, ForbiddenExecption, UnAuthorizedExecption {
-        ShareInfo shareInfo = getShareInfo(token, user);
+        ShareInfo shareInfo = getShareInfo(token, user);  // TODO
 
         verifyShareUser(user, shareInfo);
 
@@ -287,7 +287,7 @@ public class ShareServiceImpl implements ShareService {
             Iterator<ShareWidget> iterator = shareWidgets.iterator();
             while (iterator.hasNext()) {
                 ShareWidget shareWidget = iterator.next();
-                String dateToken = generateShareToken(shareWidget.getId(), shareInfo.getSharedUserName(), shareInfo.getShareUser().getId());
+                String dateToken = generateShareToken(shareWidget.getId(), shareInfo.getSharedUserName(), shareInfo.getShareUser().getId(),shareInfo.getJwtTimeoutMs());  // 这里需要根据token的期限生成对应期限的dataToken
                 shareWidget.setDataToken(dateToken);
             }
         }
@@ -305,6 +305,9 @@ public class ShareServiceImpl implements ShareService {
             if (tokenUser == null || !tokenUser.getId().equals(user.getId())) {
                 throw new ForbiddenExecption("ERROR Permission denied");
             }
+        }
+        if(!SSOUtils.checkUser(shareInfo)) {
+        	throw new ForbiddenExecption("ERROR Permission denied");
         }
     }
 
@@ -441,7 +444,14 @@ public class ShareServiceImpl implements ShareService {
      */
     @Override
     public String generateShareToken(Long shareEntityId, String username, Long userId) throws ServerException {
-        /**
+        String jwtToken = generateShareToken(shareEntityId, username, userId,null) ;
+        //生成token 并 aes加密
+        return jwtToken;
+    }
+    
+    @Override
+    public String generateShareToken(Long shareEntityId, String username, Long userId,Long jwtTimeoutMs) throws ServerException {
+    	/**
          * username: share实体Id:-:分享人id[:-:被分享人用户名]
          * password: share实体Id[:-:被分享人Id]
          */
@@ -458,9 +468,14 @@ public class ShareServiceImpl implements ShareService {
         }
         shareToken.setUsername(tokenUserName);
         shareToken.setPassword(tokenPassword);
-
-        //生成token 并 aes加密
-        return AESUtils.encrypt(tokenUtils.generateContinuousToken(shareToken), null);
+        if(jwtTimeoutMs==null) {
+        	//生成token 并 aes加密
+            return AESUtils.encrypt(tokenUtils.generateContinuousToken(shareToken), null);
+        }else {
+        	shareToken.setUserCode(SSOUtils.getUserCode());
+        	//生成token 并 aes加密
+            return AESUtils.encrypt(tokenUtils.generateToken(shareToken,jwtTimeoutMs), null);
+        }
     }
 
     /**
@@ -483,7 +498,13 @@ public class ShareServiceImpl implements ShareService {
         //获取分享信息
         String tokenUserName = tokenUtils.getUsername(decrypt);
         String tokenPassword = tokenUtils.getPassword(decrypt);
-
+        String userCode = tokenUtils.getUserCode(decrypt);
+        Date expirationDate = tokenUtils.getExpirationDate(decrypt);
+        Long jwtTimeoutMs = null ;
+        if(expirationDate!=null) {
+        	jwtTimeoutMs = expirationDate.getTime() - System.currentTimeMillis();
+        }
+        
         String[] tokenInfos = tokenUserName.split(Constants.SPLIT_CHAR_STRING);
         String[] tokenCrypts = tokenPassword.split(Constants.SPLIT_CHAR_STRING);
 
@@ -500,7 +521,8 @@ public class ShareServiceImpl implements ShareService {
         if (null == shareUser) {
             throw new ServerException("Invalid share token");
         }
-
+        shareUser.setUserCode(userCode);
+        
         String sharedUserName = null;
         if (tokenInfos.length == 3) {
             if (tokenCrypts.length < 2) {
@@ -527,7 +549,7 @@ public class ShareServiceImpl implements ShareService {
             throw new ServerException("Invalid share token");
         }
 
-        return new ShareInfo(shareId1, shareUser, sharedUserName);
+        return new ShareInfo(shareId1, shareUser, sharedUserName,expirationDate,jwtTimeoutMs);
     }
 
 

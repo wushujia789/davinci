@@ -124,6 +124,10 @@ public class Consts {
      * Token 密码
      */
     public static final String TOKEN_USER_PASSWORD = "token_user_password";
+    /**
+     * Token ssoUserCode
+     */
+    public static final String TOKEN_SSO_USER_CODE = "token_sso_user_code";
 
     /**
      * Token 创建时间
@@ -173,6 +177,7 @@ public class Consts {
 
     public static final Pattern PATTERN_JDBC_TYPE = Pattern.compile("jdbc:\\w+");
 
+
     public static final String DIR_DOWNLOAD = File.separator + "download" + File.separator;
 
     public static final String DIR_SHARE_DOWNLOAD = File.separator + "share" + File.separator + "download" + File.separator;
@@ -200,4 +205,5 @@ public class Consts {
     public static final String JDBC_DATASOURCE_DEFAULT_VERSION = "Default";
 
     public static final String PATH_EXT_FORMATER = "lib" + File.separator  + "ext" + File.separator + "%s" + File.separator + "%s" + File.separator;
+
 }

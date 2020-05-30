@@ -31,4 +31,7 @@ public class TokenEntity extends TokenDetail {
 
     @Autowired
     private String password;
+    
+    @Autowired
+    private String userCode;
 }
