@@ -33,9 +33,14 @@ public class CustomUserServiceImpl extends BaseEntityService implements CustomUs
     
 	@Override
 	public User regist(UserRegist userRegist) throws ServerException {
-		User user = userService.regist(userRegist);
-		activateUser(user.getUsername());
-    	return user;
+		boolean exist = userService.isExist(userRegist.getUsername(), null, null);
+		if(!exist) {
+			User user = userService.regist(userRegist);
+			activateUser(user.getUsername());
+	    	return user;
+		}else {
+			return null ;
+		}
     }
 	
 	@Transactional
