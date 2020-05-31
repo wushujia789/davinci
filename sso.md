@@ -1,0 +1,3 @@
+和dataAuth使用同样的sso配置文件，共用一个redis和配置一样的appSys
+dataAuth本地登录成功后往父域名cookie里面写入tokenId，key值为biTokenId，该sso配置文件里面读取的tokenId配置为biTokenId
+dataAuth里面的本地登录需要调用davinci的用户注册接口，jwt里面包含davinci的用户名 

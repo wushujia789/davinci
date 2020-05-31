@@ -439,6 +439,12 @@
 		<!--<version>2.3.0</version> -->
 		<!--</dependency> -->
 		
+		<!--SSO-->
+        <dependency>
+            <groupId>com.weshare</groupId>
+            <artifactId>spring-boot-starter-sso</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 
 	<build>
