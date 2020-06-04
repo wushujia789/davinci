@@ -553,7 +553,7 @@ public class ViewServiceImpl extends BaseEntityService implements ViewService {
 
 
     /**
-     * 获取结果集
+     * 获取结果集 TODO
      *
      * @param isMaintainer
      * @param viewWithSource
